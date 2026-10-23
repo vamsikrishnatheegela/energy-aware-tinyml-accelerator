@@ -9,20 +9,28 @@
 `rtl/conv_mac_engine.sv` accumulates one product per valid cycle. Assert `start` for one clock to clear the reduction and enter the busy state. Then present activation/weight pairs with `input_valid=1`; assert `in_last` alongside the final valid pair. The final sum is captured in `result` and `result_valid` pulses for one cycle. The controller must not issue a new `start` while a reduction is in progress.
 
 ### Requantization and activation
-`rtl/requantize_relu.sv` applies signed rounding, arithmetic right shift, optional ReLU, and saturation to signed INT8 or INT4 range. The current interface uses a shift amount as the fixed-point scale. It is a building block; the exact scale and rounding behavior must be matched to the software golden model.
+`rtl/requantize_relu.sv` applies signed rounding, arithmetic right shift, optional ReLU, and saturation to signed INT8 or INT4 range. The current interface uses a shift amount as the fixed-point scale. The exact scale and rounding behavior must match the software golden model.
 
 INT4 range: -8 to +7. INT8 range: -128 to +127. The 32-bit accumulator is a baseline width, not a claim that every possible layer is overflow-proof. Layer-level range analysis is required before CNN deployment.
 
-## Depthwise 3x3 reduction
-`rtl/depthwise_conv3x3.sv` accepts nine activation/weight pairs for one channel and one spatial output, in tap order. It accumulates one valid pair per cycle and asserts `result_valid` on the ninth valid tap. It supports signed INT4 and INT8 operands. It does not yet generate sliding windows or contain line buffers; those belong in the next integration layer.
+### Depthwise 3x3 reduction
+`rtl/depthwise_conv3x3.sv` accepts nine activation/weight pairs for one channel and one spatial output, in tap order. It accumulates one valid pair per cycle and asserts `result_valid` on the ninth valid tap. It supports signed INT4 and INT8 operands.
+
+### Streaming 3x3 window generator
+`rtl/sliding_window_3x3.sv` accepts a raster-ordered stream of signed 8-bit pixels and uses two line memories plus horizontal delay registers to emit 3x3 windows. `IMAGE_WIDTH` is an elaboration-time parameter. Pulse `frame_start` before each frame; the block emits valid windows only when row and column indices are at least two. It currently assumes a continuous raster stream with no backpressure, no padding, and stride one. Line-memory read style and implementation mapping must be checked against the chosen synthesis tool and SRAM strategy.
+
+### Pointwise 1x1 reduction
+`rtl/pointwise_conv1x1.sv` wraps the generic reduction engine for one output channel at one spatial position. Supply one activation/weight pair per input channel and assert `in_last` on the final pair. An outer controller must select each output channel's weights and repeat the reduction for each output channel. This is a functional building block, not yet a multi-channel layer controller.
+
+## Current integration status
+The project has individually testable arithmetic, depthwise-reduction, window-generation, and pointwise-reduction blocks. A complete layer-level top module, memory/weight interface, and end-to-end image inference test are still pending. The current window generator produces signed 8-bit pixels; INT4 mode is applied in the compute engines by interpreting the low nibbles of their input buses.
 
 ## Planned hierarchy
-1. Configurable MAC and generic reduction engine — RTL implemented and simulation-tested.
-2. Depthwise 3x3 tap reduction — RTL implemented; run `make sim` to verify locally.
-3. Sliding-window generator and line buffers.
-4. Pointwise convolution channel-mixing controller.
-5. Layer configuration, memory interface, and Python golden model.
-6. End-to-end verification, synthesis and physical design on a supported open PDK.
+1. Integrate a layer controller around the window generator and depthwise compute.
+2. Add explicit channel/weight storage and pointwise output-channel sequencing.
+3. Define layer configuration, output buffering, quantization scales, and the external input/output protocol.
+4. Add a Python golden model and end-to-end test vectors.
+5. Synthesize the integrated top, then run floorplanning, placement, CTS, routing, extraction/STA and physical verification on a supported open PDK.
 
 ## Energy-aware experiments
 Measure rather than assume benefits:
