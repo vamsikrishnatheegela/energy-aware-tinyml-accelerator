@@ -47,3 +47,9 @@ For each experiment record functional equivalence, cell area, critical path, fre
 - Define rounding, saturation, and quantization semantics before connecting a framework model.
 - Avoid inferred latches and unconstrained asynchronous crossings.
 - Treat clock gating as a later implementation step; use a supported integrated clock-gating methodology rather than gating clocks with arbitrary RTL logic.
+
+
+## Integrated depthwise-pointwise tile
+`rtl/depthwise_pointwise_tile.sv` is the first controller-level integration. For one spatial position, the upstream controller supplies one 3x3 window per input channel, sequentially. The tile performs a nine-tap depthwise reduction per channel, requantizes each result, stores the quantized depthwise features, then performs one pointwise reduction per output channel and emits `out_valid`, `out_channel`, and `out_data`. `pixel_done` pulses after the final output channel; the tile returns to idle and expects a new `start` for the next spatial position.
+
+Weights are programmed through the depthwise and pointwise weight-load ports while idle. The window is packed with tap 0 in bits [7:0], tap 1 in [15:8], and so on. The current tile processes one spatial position at a time and expects the upstream window generator/controller to handle image raster scheduling and channel ordering. This is not yet a full image-level accelerator top or a complete CNN inference engine. Validate the controller and data ordering with the integrated testbench before synthesis.
