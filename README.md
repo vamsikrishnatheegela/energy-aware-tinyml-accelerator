@@ -20,8 +20,8 @@ A reproducible RTL-to-GDSII learning project for an energy-aware accelerator tar
 - `reports/` — generated reports (not source-of-truth; large artifacts ignored)
 
 ## First milestone
-1. Run `scripts/run_iverilog.sh` (requires Icarus Verilog).
-2. Confirm the self-checking MAC test passes.
+1. Run `make sim` (requires Icarus Verilog).
+2. Confirm the self-checking MAC test prints `ALL TESTS PASSED`.
 3. Extend verification for overflow, signed extrema, reset, and precision switching.
 4. Add the convolution datapath and golden-model comparison before physical design.
 
