@@ -13,13 +13,16 @@
 
 INT4 range: -8 to +7. INT8 range: -128 to +127. The 32-bit accumulator is a baseline width, not a claim that every possible layer is overflow-proof. Layer-level range analysis is required before CNN deployment.
 
+## Depthwise 3x3 reduction
+`rtl/depthwise_conv3x3.sv` accepts nine activation/weight pairs for one channel and one spatial output, in tap order. It accumulates one valid pair per cycle and asserts `result_valid` on the ninth valid tap. It supports signed INT4 and INT8 operands. It does not yet generate sliding windows or contain line buffers; those belong in the next integration layer.
+
 ## Planned hierarchy
-1. MAC and reduction engine — initial RTL implemented.
-2. Depthwise convolution controller and input/weight buffers.
-3. Pointwise convolution channel-mixing controller.
-4. Layer configuration and memory interface.
-5. Python golden model and end-to-end convolution verification.
-6. Synthesis and physical design on a supported open PDK.
+1. Configurable MAC and generic reduction engine — RTL implemented and simulation-tested.
+2. Depthwise 3x3 tap reduction — RTL implemented; run `make sim` to verify locally.
+3. Sliding-window generator and line buffers.
+4. Pointwise convolution channel-mixing controller.
+5. Layer configuration, memory interface, and Python golden model.
+6. End-to-end verification, synthesis and physical design on a supported open PDK.
 
 ## Energy-aware experiments
 Measure rather than assume benefits:
