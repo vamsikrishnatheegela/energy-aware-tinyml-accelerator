@@ -64,7 +64,7 @@ module tb_quant_mac;
         clear = 1'b1; mac_en = 1'b0;
         tick();
         clear = 1'b0; int8_mode = 1'b1; mac_en = 1'b1;
-        a = -8'sd128; b = 8'sd127;
+        a = 8'sh80; b = 8'sd127;
         tick();
         check(-16256, "INT8 extreme signed product");
 
