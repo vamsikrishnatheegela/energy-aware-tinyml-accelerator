@@ -1,0 +1,45 @@
+# Simulation and synthesis outputs
+build/
+sim_build/
+obj_dir/
+*.vcd
+*.fst
+*.lxt
+*.log
+*.jou
+*.history
+*.wlf
+*.vvp
+*.o
+*.a
+*.so
+
+# Physical design outputs and generated databases
+reports/generated/
+results/
+runs/
+openlane/
+OpenROAD-flow-scripts/flow/results/
+OpenROAD-flow-scripts/flow/reports/
+*.odb
+*.def
+*.gds
+*.gdsii
+*.lef
+*.spef
+*.sdf
+*.lib
+*.sram
+*.rpt
+*.check
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
