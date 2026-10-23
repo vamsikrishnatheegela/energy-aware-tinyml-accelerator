@@ -13,6 +13,8 @@ module quant_mac (
 );
     logic signed [7:0]  a_eff;
     logic signed [7:0]  b_eff;
+    logic signed [15:0] a_ext;
+    logic signed [15:0] b_ext;
     logic signed [15:0] product;
 
     always_comb begin
@@ -23,7 +25,11 @@ module quant_mac (
             a_eff = {{4{a[3]}}, a[3:0]};
             b_eff = {{4{b[3]}}, b[3:0]};
         end
-        product = a_eff * b_eff;
+
+        // Explicit sign extension makes the signed product width unambiguous.
+        a_ext = {{8{a_eff[7]}}, a_eff};
+        b_ext = {{8{b_eff[7]}}, b_eff};
+        product = a_ext * b_ext;
     end
 
     always_ff @(posedge clk) begin
