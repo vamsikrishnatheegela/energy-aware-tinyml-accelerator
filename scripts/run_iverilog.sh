@@ -26,3 +26,8 @@ vvp build/tb_sliding_window_3x3.vvp
 iverilog -g2012 -Wall -s tb_pointwise_conv1x1 -o build/tb_pointwise_conv1x1.vvp \
   rtl/conv_mac_engine.sv rtl/pointwise_conv1x1.sv tb/tb_pointwise_conv1x1.sv
 vvp build/tb_pointwise_conv1x1.vvp
+
+iverilog -g2012 -Wall -s tb_depthwise_pointwise_tile -o build/tb_depthwise_pointwise_tile.vvp \
+  rtl/depthwise_conv3x3.sv rtl/conv_mac_engine.sv rtl/requantize_relu.sv \
+  rtl/depthwise_pointwise_tile.sv tb/tb_depthwise_pointwise_tile.sv
+vvp build/tb_depthwise_pointwise_tile.vvp
