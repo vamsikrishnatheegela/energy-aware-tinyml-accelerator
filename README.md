@@ -1,8 +1,8 @@
 # Energy-Aware INT4/INT8 TinyML Accelerator
 
-A reproducible RTL-to-GDSII learning project for an energy-aware accelerator targeting depthwise-separable CNN inference. The initial milestone is a verified signed INT4/INT8 multiply-accumulate (MAC) datapath; convolution control, quantization, synthesis, physical design, and power analysis will be added incrementally.
+A reproducible RTL-to-GDSII learning and research project targeting quantized depthwise-separable CNN inference.
 
-> **Status:** Initial RTL scaffold. No PPA, power, CNN-accuracy, DRC/LVS, or signoff results are claimed yet.
+> **Status:** Foundational arithmetic and convolution blocks are under active development. Individual simulation tests exist for the configurable MAC, sequential MAC, requantization, depthwise 3x3 reduction, streaming window generation, and pointwise 1x1 reduction. The complete layer controller, end-to-end inference verification, and physical-design results are not yet complete. No PPA, power, CNN-accuracy, DRC/LVS, or signoff results are claimed.
 
 ## Goals
 - Implement signed two's-complement INT4 and INT8 MAC operations.
@@ -15,15 +15,12 @@ A reproducible RTL-to-GDSII learning project for an energy-aware accelerator tar
 - `rtl/` — synthesizable SystemVerilog
 - `tb/` — self-checking simulation testbenches
 - `scripts/` — local simulation and flow helpers
-- `constraints/` — timing constraints (initial template; must be tuned)
+- `constraints/` — timing constraints (templates must be tuned for the integrated top)
 - `docs/` — architecture, verification, and PPA methodology
 - `reports/` — generated reports (not source-of-truth; large artifacts ignored)
 
-## First milestone
-1. Run `make sim` (requires Icarus Verilog).
-2. Confirm the self-checking MAC test prints `ALL TESTS PASSED`.
-3. Extend verification for overflow, signed extrema, reset, and precision switching.
-4. Add the convolution datapath and golden-model comparison before physical design.
+## Simulation
+Run `make sim` with Icarus Verilog installed. The script runs the individual self-checking testbenches. Treat any failed assertion as a blocker before integrating or synthesizing.
 
 ## RTL-to-GDSII flow
 The intended educational flow uses open-source tools such as Yosys, OpenROAD/OpenROAD-flow-scripts, OpenSTA, KLayout, Magic, and Netgen, with a supported PDK/platform (for example, SKY130). Exact commands and configuration depend on the installed flow and PDK.
